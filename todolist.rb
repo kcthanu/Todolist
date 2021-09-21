@@ -12,11 +12,29 @@ class Todo
   end
   
   def to_displayable_string
-    puts "[ ] #{@text} #{@due_date}"
+    if @completed
+        display_status = "X"
+    else
+        display_status = " "
+    end
+    if @due_date == Date.today
+        display_date = ""
+    else
+        display_date = @due_date
+    end
+    puts "[#{display_status}] #{@text} #{display_date}"
   end
   
-  def overdue
-    @completed
+  def overdue?
+    @due_date < Date.today
+  end
+  
+  def due_today?
+    @due_date == Date.today
+  end
+  
+  def due_later?
+    @due_date > Date.today
   end
 end
 
@@ -27,16 +45,24 @@ class TodosList
     @todos = todos
   end
 
-  def overdue
-    TodosList.new(@todos.filter { |todo| todo.overdue? })
-  end  
-
   def add(todo)
-      @todos.push(todo)
+    @todos.push(todo)
   end
 
+  def overdue
+    TodosList.new(@todos.select { |todo| todo.overdue? })
+  end  
+  
+  def due_today
+    TodosList.new(@todos.select { |todo| todo.due_today? })
+  end
+  
+  def due_later
+    TodosList.new(@todos.select { |todo| todo.due_later? })
+  end
+  
   def to_displayable_list
-   #
+    @todos.each{ |todo| todo.to_displayable_string}
   end
 end
 
